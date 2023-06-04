@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type ITokenManager interface {
-	GenerateToken(username string, role string, exp time.Time) (string, error)
-	ValidateToken(token string) (*jwt.Token, error)
-}
-
 type TokenManager struct {
 	secretKey string
 	issuer    string

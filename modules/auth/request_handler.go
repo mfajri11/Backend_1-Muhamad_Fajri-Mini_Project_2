@@ -3,7 +3,6 @@ package auth
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/dto"
-	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/modules/auth"
 	accountRepo "github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
 	"gorm.io/gorm"
 	"net/http"
@@ -12,20 +11,20 @@ import (
 
 type AuthRequestHandler struct {
 	authCtrl     IAuthController
-	tokenManager auth.ITokenManager
+	tokenManager ITokenManager
 }
 
 func NewAuthRequestHandler(db *gorm.DB) *AuthRequestHandler {
 	return &AuthRequestHandler{
-		authCtrl: AuthController{
-			AuthUC: AuthUseCase{
+		authCtrl: &AuthController{
+			AuthUC: &AuthUseCase{
 				accountRepo: accountRepo.NewUserRepository(db),
 			},
 		},
 	}
 }
 
-func (h AuthRequestHandler) Login(c *gin.Context) {
+func (h *AuthRequestHandler) Login(c *gin.Context) {
 	username, password, ok := c.Request.BasicAuth()
 	if !ok {
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
@@ -44,7 +43,7 @@ func (h AuthRequestHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func (h AuthRequestHandler) AuthorizationRequired(c *gin.Context) {
+func (h *AuthRequestHandler) AuthorizationRequired(c *gin.Context) {
 	bearerSchema := "bearer "
 	tokenStr := c.Request.Header.Get("Authorization")
 	if !strings.HasPrefix(tokenStr, bearerSchema) {

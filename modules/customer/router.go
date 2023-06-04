@@ -1,13 +1,24 @@
 package customer
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/customer"
+	"gorm.io/gorm"
+)
 
 type CustomerRouter struct {
 	customerHandler CustomerRequestHandler
 }
 
-func NewCustomerRouter(customerHandler CustomerRequestHandler) *CustomerRouter {
-	return &CustomerRouter{customerHandler: customerHandler}
+func NewCustomerRouter(db *gorm.DB) *CustomerRouter {
+	return &CustomerRouter{
+		customerHandler: CustomerRequestHandler{
+			customerController: &CustomerController{
+				customerUC: &CustomerUseCase{
+					customerRepo: customer.NewCustomerRepository(db),
+				},
+			},
+		}}
 }
 
 func (r CustomerRouter) Handle(e *gin.Engine) {

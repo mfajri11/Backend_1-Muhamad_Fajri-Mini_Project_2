@@ -2,8 +2,8 @@ package auth
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	accountRepo "github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
-	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/utils/security"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -12,16 +12,21 @@ type IAuthUseCase interface {
 	Login(username, password string) (token string, exp time.Time, err error)
 }
 
+type ITokenManager interface {
+	GenerateToken(username string, role string, exp time.Time) (string, error)
+	ValidateToken(token string) (*jwt.Token, error)
+}
+
 type AuthUseCase struct {
 	accountRepo  accountRepo.IAccountRepository
-	tokenManager security.ITokenManager
+	tokenManager ITokenManager
 }
 
 func NewAuthUseCase(accountRepo accountRepo.IAccountRepository) *AuthUseCase {
 	return &AuthUseCase{accountRepo: accountRepo}
 }
 
-func (uc AuthUseCase) Login(username, password string) (token string, exp time.Time, err error) {
+func (uc *AuthUseCase) Login(username, password string) (token string, exp time.Time, err error) {
 	acc, err := uc.accountRepo.FirstByUsername(username)
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("modules.AuthUseCase.Login: error find account: %w", err)

@@ -18,7 +18,7 @@ func NewRegisterApprovalController(registerApprovalUseCase IRegisterApprovalUseC
 	return &RegisterApprovalController{registerApprovalUseCase: registerApprovalUseCase}
 }
 
-func (ctrl RegisterApprovalController) FindAll(page int) (RegisterApprovalResponse, error) {
+func (ctrl *RegisterApprovalController) FindAll(page int) (RegisterApprovalResponse, error) {
 	approvs, err := ctrl.registerApprovalUseCase.FindAll(page)
 	if err != nil {
 		return RegisterApprovalResponse{}, fmt.Errorf("modules.RegisterApprovalController.FindAll: error find approval: %w", err)
@@ -47,7 +47,7 @@ func (ctrl RegisterApprovalController) FindAll(page int) (RegisterApprovalRespon
 
 }
 
-func (ctrl RegisterApprovalController) UpdateApprovalStatus(id uint, val string) error {
+func (ctrl *RegisterApprovalController) UpdateApprovalStatus(id uint, val string) error {
 	err := ctrl.registerApprovalUseCase.UpdateApprovalStatus(id, val)
 	if err != nil {
 		return fmt.Errorf("modules.RegisterApprovalController.UpdateApprovalStatus: error update approval: %w", err)

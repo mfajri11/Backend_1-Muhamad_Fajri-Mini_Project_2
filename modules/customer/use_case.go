@@ -21,7 +21,7 @@ func NewCustomerUseCase(customerRepo customerRepository.ICustomerRepository) *Cu
 	return &CustomerUseCase{customerRepo: customerRepo}
 }
 
-func (uc CustomerUseCase) Create(customer CustomerParams) (entity.Customer, error) {
+func (uc *CustomerUseCase) Create(customer CustomerParams) (entity.Customer, error) {
 	newCustomer := entity.Customer{
 		FirstName: customer.FirstName,
 		LastName:  customer.LastName,
@@ -37,7 +37,7 @@ func (uc CustomerUseCase) Create(customer CustomerParams) (entity.Customer, erro
 	return newCustomer, nil
 }
 
-func (uc CustomerUseCase) Update(customer CustomerParams) (*entity.Customer, error) {
+func (uc *CustomerUseCase) Update(customer CustomerParams) (*entity.Customer, error) {
 	newCustomer := entity.Customer{
 		FirstName: customer.FirstName,
 		LastName:  customer.LastName,
@@ -53,7 +53,7 @@ func (uc CustomerUseCase) Update(customer CustomerParams) (*entity.Customer, err
 	return customerUpdated, nil
 }
 
-func (uc CustomerUseCase) Delete(id uint) error {
+func (uc *CustomerUseCase) Delete(id uint) error {
 	err := uc.customerRepo.Delete(id)
 	if err != nil {
 		return fmt.Errorf("modules.CustomerUseCase.Create: error create customer %w", err)
@@ -62,7 +62,7 @@ func (uc CustomerUseCase) Delete(id uint) error {
 	return nil
 }
 
-func (uc CustomerUseCase) Search(page int, name string, email string) ([]*entity.Customer, error) {
+func (uc *CustomerUseCase) Search(page int, name string, email string) ([]*entity.Customer, error) {
 	customers, err := uc.customerRepo.Search(page, name, email)
 	if err != nil {
 		return nil, fmt.Errorf("modules.CustomerUseCase.Create: error create customer %w", err)

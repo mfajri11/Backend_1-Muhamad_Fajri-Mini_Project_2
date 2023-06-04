@@ -15,8 +15,8 @@ type RegisterApprovalRequestHandler struct {
 
 func NewRegisterApprovalRequestHandler(db *gorm.DB) *RegisterApprovalRequestHandler {
 	return &RegisterApprovalRequestHandler{
-		registerApprovalController: RegisterApprovalController{
-			registerApprovalUseCase: RegisterApprovalUseCase{
+		registerApprovalController: &RegisterApprovalController{
+			registerApprovalUseCase: &RegisterApprovalUseCase{
 				registerApprovalRepo: register_approval.NewRegisterApproval(db),
 			},
 		},

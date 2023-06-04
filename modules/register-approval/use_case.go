@@ -19,7 +19,7 @@ func NewRegisterApprovalUseCase(registerApprovalRepo registerApprovalRepo.IRegis
 	return &RegisterApprovalUseCase{registerApprovalRepo: registerApprovalRepo}
 }
 
-func (uc RegisterApprovalUseCase) FindAll(page int) ([]*entity.RegisterApproval, error) {
+func (uc *RegisterApprovalUseCase) FindAll(page int) ([]*entity.RegisterApproval, error) {
 	approvs, err := uc.registerApprovalRepo.FindAll(page)
 	if err != nil {
 		return nil, fmt.Errorf("modules.RegisterApprovalUseCase.FindAll: error find approval: %w", err)
@@ -28,7 +28,7 @@ func (uc RegisterApprovalUseCase) FindAll(page int) ([]*entity.RegisterApproval,
 	return approvs, nil
 }
 
-func (uc RegisterApprovalUseCase) UpdateApprovalStatus(id uint, val string) error {
+func (uc *RegisterApprovalUseCase) UpdateApprovalStatus(id uint, val string) error {
 	err := uc.registerApprovalRepo.UpdateApprovalStatus(id, val)
 	if err != nil {
 		return fmt.Errorf("modules.RegisterApprovalUseCase.UpdateApprovalStatus: error update approval: %w", err)

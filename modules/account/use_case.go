@@ -99,3 +99,15 @@ func (_ *AccountUseCase) isSuperAdmin(ctx context.Context) bool {
 	acc := payload.(security.JWTClaims)
 	return acc.Role == "super admin"
 }
+
+func (uc *AccountUseCase) Delete(ctx context.Context, id uint) error {
+	if !uc.isSuperAdmin(ctx) {
+		return fmt.Errorf("modules.AccountUseCase.Delete: error delete account")
+	}
+	err := uc.accountRepo.Delete(id)
+	if err != nil {
+		return fmt.Errorf("modules.AccountUseCase.Delete: error delete account %w", err)
+	}
+
+	return nil
+}

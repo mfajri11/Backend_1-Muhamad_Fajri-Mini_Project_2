@@ -17,7 +17,7 @@ func NewAuthController(authUC IAuthUseCase) *AuthController {
 	return &AuthController{AuthUC: authUC}
 }
 
-func (ctrl AuthController) Login(req LoginParams) (LoginResponse, error) {
+func (ctrl *AuthController) Login(req LoginParams) (LoginResponse, error) {
 	token, exp, err := ctrl.AuthUC.Login(req.Username, req.Password)
 	if err != nil {
 		return LoginResponse{}, fmt.Errorf("modules.LoginResponse.Login: error login: %w", err)
