@@ -3,7 +3,6 @@ package security
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/modules/auth"
 	"time"
 )
 
@@ -22,7 +21,7 @@ func NewTokenManager(secretKey string) *TokenManager {
 }
 
 func (t *TokenManager) GenerateToken(name, role string, exp time.Time) (string, error) {
-	claims := auth.JWTClaims{
+	claims := JWTClaims{
 		Role: role,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  exp.Unix(),
@@ -50,4 +49,9 @@ func (t *TokenManager) ValidateToken(tokenStr string) (*jwt.Token, error) {
 
 		return []byte(t.secretKey), nil
 	})
+}
+
+type JWTClaims struct {
+	Role string `json:"role"`
+	jwt.StandardClaims
 }
