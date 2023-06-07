@@ -2,25 +2,17 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
-	accountRepo "github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
-	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/utils/security"
 	"gorm.io/gorm"
 )
 
 type AuthRouter struct {
-	authHandler AuthRequestHandler
+	authHandler *AuthRequestHandler
 }
 
 func NewAuthRouter(db *gorm.DB) *AuthRouter {
 	return &AuthRouter{
-		authHandler: AuthRequestHandler{
-			authCtrl: &AuthController{
-				AuthUC: &AuthUseCase{
-					accountRepo:  accountRepo.NewAccountRepository(db),
-					tokenManager: security.NewTokenManager("secret"),
-				},
-			},
-		}}
+		authHandler: NewAuthRequestHandler(db),
+	}
 }
 
 func (r AuthRouter) Handle(router *gin.Engine) {
