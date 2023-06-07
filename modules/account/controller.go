@@ -35,8 +35,10 @@ func (ctrl *AccountController) Create(ctx context.Context, req AccountParams) (A
 			ResponseTime: "",
 		},
 		AccountParams{
-			UserName: account.Username,
-			RoleName: account.Role.Name,
+			UserName:  account.Username,
+			RoleName:  account.Role.Name,
+			Activated: bool(account.Activated),
+			Verified:  bool(account.Verified),
 		},
 	}
 	return res, nil
@@ -55,8 +57,10 @@ func (ctrl *AccountController) Update(ctx context.Context, req AccountUpdatePara
 			ResponseTime: "",
 		},
 		AccountParams{
-			UserName: account.Username,
-			RoleName: account.Role.Name,
+			UserName:  account.Username,
+			RoleName:  account.Role.Name,
+			Activated: bool(account.Activated),
+			Verified:  bool(account.Verified),
 		},
 	}
 	return res, nil
@@ -93,8 +97,10 @@ func (ctrl *AccountController) FindByUsername(page int, username string) (Accoun
 			ResponseTime: "",
 		},
 		AccountParams{
-			UserName: account.Username,
-			RoleName: account.Role.Name,
+			UserName:  account.Username,
+			RoleName:  account.Role.Name,
+			Activated: bool(account.Activated),
+			Verified:  bool(account.Verified),
 		},
 	}
 	return res, nil
