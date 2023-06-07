@@ -2,7 +2,6 @@ package auth
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	accountRepo "github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
 	"golang.org/x/crypto/bcrypt"
 	"time"
@@ -10,11 +9,12 @@ import (
 
 type IAuthUseCase interface {
 	Login(username, password string) (token string, exp time.Time, err error)
+	ValidateToken(token string) (any, error)
 }
 
 type ITokenManager interface {
 	GenerateToken(username string, role string, exp time.Time) (string, error)
-	ValidateToken(token string) (*jwt.Token, error)
+	ValidateToken(token string) (any, error)
 }
 
 type AuthUseCase struct {
@@ -41,4 +41,9 @@ func (uc *AuthUseCase) Login(username, password string) (token string, exp time.
 		return "", time.Time{}, fmt.Errorf("modules.AuthUseCase.Login: error generate token %w", err)
 	}
 	return token, expireTime, nil
+}
+
+func (uc AuthUseCase) ValidateToken(token string) (any, error) {
+	return uc.tokenManager.ValidateToken(token)
+
 }

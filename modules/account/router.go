@@ -17,8 +17,8 @@ func (r *AccountRouter) Handle(e *gin.Engine) {
 	basePath := "/account"
 	account := e.Group(basePath)
 	account.POST("/", r.Accounthandler.Create)
-	account.PUT("/:id", r.Accounthandler.Update)
+	account.PATCH("/:id", r.Accounthandler.Update)
 	account.DELETE("/:id", r.Accounthandler.Delete)
 	account.GET("/search", r.Accounthandler.FindByUsername)
-	account.PUT("/:id/activated/", r.Accounthandler.UpdateActivatedAccount)
+	account.PATCH("/:id/activated/", r.Accounthandler.UpdateActivatedAccount)
 }

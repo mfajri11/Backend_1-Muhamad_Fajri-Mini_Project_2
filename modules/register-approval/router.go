@@ -25,5 +25,5 @@ func (r RegisterApprovalRouter) Handle(router *gin.Engine) {
 	basePath := "/approve"
 	approve := router.Group(basePath)
 	approve.GET("/", r.registerApprovalHandler.FindAll)
-	approve.PUT("/:id", r.registerApprovalHandler.UpdateApprovalStatus)
+	approve.PATCH("/:id", r.registerApprovalHandler.UpdateApprovalStatus)
 }

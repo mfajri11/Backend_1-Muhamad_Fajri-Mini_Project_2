@@ -16,7 +16,7 @@ func NewAuthRouter(db *gorm.DB) *AuthRouter {
 		authHandler: AuthRequestHandler{
 			authCtrl: &AuthController{
 				AuthUC: &AuthUseCase{
-					accountRepo:  accountRepo.NewUserRepository(db),
+					accountRepo:  accountRepo.NewAccountRepository(db),
 					tokenManager: security.NewTokenManager("secret"),
 				},
 			},

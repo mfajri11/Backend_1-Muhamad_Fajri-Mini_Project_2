@@ -12,17 +12,19 @@ import (
 
 func main() {
 	router := gin.New()
+	router.Use(gin.Recovery())
 	store := db.MustOpenGormMysql()
 
 	accountRouter := account.NewAccountRouter(store)
 	customerRouter := customer.NewCustomerRouter(store)
 	approvalRouter := register_approval.NewRegisterApprovalRouter(store)
 	authRouter := auth.NewAuthRouter(store)
-
-	accountRouter.Handle(router)
-	customerRouter.Handle(router)
-	approvalRouter.Handle(router)
 	authRouter.Handle(router)
+	// wrapper for middleware
+	authorizeWrapper := authRouter.UseAuthorizationRequired(router)
+	accountRouter.Handle(authorizeWrapper)
+	customerRouter.Handle(authorizeWrapper)
+	approvalRouter.Handle(authorizeWrapper)
 
 	log.Fatal(router.Run(":8080"))
 }

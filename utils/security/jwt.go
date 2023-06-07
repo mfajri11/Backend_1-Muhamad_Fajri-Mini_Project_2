@@ -16,7 +16,7 @@ func NewTokenManager(secretKey string) *TokenManager {
 }
 
 func (t *TokenManager) GenerateToken(name, role string, exp time.Time) (string, error) {
-	claims := JWTClaims{
+	claims := &JWTClaims{
 		Role: role,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  exp.Unix(),
@@ -35,15 +35,25 @@ func (t *TokenManager) GenerateToken(name, role string, exp time.Time) (string, 
 	return tokenStr, nil
 }
 
-func (t *TokenManager) ValidateToken(tokenStr string) (*jwt.Token, error) {
-
-	return jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if token.Method != jwt.SigningMethodHS256 {
+func (t *TokenManager) ValidateToken(tokenStr string) (any, error) {
+	claim := &JWTClaims{}
+	payload, err := jwt.ParseWithClaims(tokenStr, claim, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("modules.TokenManager.ValidateToken: miss match algo type got %s want 'HS256:'", token.Method.Alg())
 		}
 
 		return []byte(t.secretKey), nil
 	})
+
+	if err != nil {
+		return nil, fmt.Errorf("modules.TokenManager.ValidateToken: error validate token: %w", err)
+	}
+	claim, ok := payload.Claims.(*JWTClaims)
+	if !ok {
+		return nil, fmt.Errorf("modules.TokenManager.ValidateToken: error invalid claim")
+	}
+
+	return claim, nil
 }
 
 type JWTClaims struct {

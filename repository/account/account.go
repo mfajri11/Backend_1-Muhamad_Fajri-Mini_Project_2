@@ -21,7 +21,7 @@ type AccountRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) IAccountRepository {
+func NewAccountRepository(db *gorm.DB) IAccountRepository {
 	return &AccountRepository{db: db}
 }
 
@@ -30,11 +30,16 @@ func (repo *AccountRepository) Create(account entity.Account) error {
 	if err != nil {
 		return fmt.Errorf("repostiory.AccountRepository.Create: error create account: %w", err)
 	}
-	err = repo.db.Create(&entity.RegisterApproval{
-		AdminID:      account.ID,
-		SuperAdminID: 1,
-		Status:       "pending",
-	}).Error
+	account.RegisterApproval.AdminID = account.ID
+	err = repo.db.Model(&entity.RegisterApproval{}).Where("id = ?", account.RegisterApprovalID).Update("admin_id", account.ID).Error
+	if err != nil {
+		return fmt.Errorf("repostiory.AccountRepository.Create: error update `register_approval`.`admin_id`: %w", err)
+	}
+	//err = repo.db.Create(&entity.RegisterApproval{
+	//	AdminID:      account.ID,
+	//	SuperAdminID: 1,
+	//	Status:       "pending",
+	//}).Error
 	return nil
 }
 
@@ -75,7 +80,7 @@ func (repo *AccountRepository) Update(account *entity.Account) (*entity.Account,
 
 func (repo *AccountRepository) FindByUsername(page int, username string) (*entity.Account, error) {
 	account := entity.Account{}
-	err := repo.db.Scopes(repository.Paginate(page)).Where("username = ? ", username).Find(&account).Error
+	err := repo.db.Preload("Role").Scopes(repository.Paginate(page)).Where("username = ? ", username).Find(&account).Error
 	if err != nil {
 		return nil, fmt.Errorf("repostiory.AccountRepository.FindByUsername: error find account: %w", err)
 	}
@@ -84,7 +89,7 @@ func (repo *AccountRepository) FindByUsername(page int, username string) (*entit
 
 func (repo *AccountRepository) FirstByUsername(username string) (*entity.Account, error) {
 	account := entity.Account{}
-	err := repo.db.First(&account, "username = ?", username).Error
+	err := repo.db.Preload("Role").First(&account, "username = ?", username).Error
 	if err != nil {
 		return nil, fmt.Errorf("repostiory.AccountRepository.FirstByUsername: error find account: %w", err)
 	}

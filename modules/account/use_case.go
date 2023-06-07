@@ -27,21 +27,22 @@ func NewAccountUseCase(accountRepo accountRepo.IAccountRepository) *AccountUseCa
 }
 
 func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParams) (entity.Account, error) {
-	if !uc.isSuperAdmin(ctx) {
-		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
-	}
+	//if !uc.isSuperAdmin(ctx) {
+	//	return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
+	//}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(accountParams.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error hash password %w", err)
 	}
 	newAccount := entity.Account{
-		Username:       accountParams.UserName,
-		HashedPassword: string(hashedPassword),
-		Role:           entity.Role{Name: accountParams.RoleName},
-		Verified:       false,
-		Activated:      false,
-		CreatedAt:      time.Time{},
-		UpdatedAt:      time.Time{},
+		Username:         accountParams.UserName,
+		HashedPassword:   string(hashedPassword),
+		Role:             entity.Role{Name: accountParams.RoleName},
+		Verified:         false,
+		Activated:        false,
+		CreatedAt:        time.Time{},
+		UpdatedAt:        time.Time{},
+		RegisterApproval: entity.RegisterApproval{Status: "pending", SuperAdminID: 1},
 	}
 	//TODO: create side effect populate newAccount with role_id and approval_id
 	err = uc.accountRepo.Create(newAccount)
@@ -49,6 +50,9 @@ func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParam
 		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error create account %w", err)
 	}
 
+	if err != nil {
+		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error update AdminID account %w", err)
+	}
 	return newAccount, nil
 }
 
@@ -96,13 +100,13 @@ func (_ *AccountUseCase) isSuperAdmin(ctx context.Context) bool {
 	if payload == nil {
 		return false
 	}
-	acc := payload.(security.JWTClaims)
+	acc := payload.(*security.JWTClaims)
 	return acc.Role == "super admin"
 }
 
 func (uc *AccountUseCase) Delete(ctx context.Context, id uint) error {
 	if !uc.isSuperAdmin(ctx) {
-		return fmt.Errorf("modules.AccountUseCase.Delete: error delete account")
+		return fmt.Errorf("modules.AccountUseCase.Delete: error is not super admin")
 	}
 	err := uc.accountRepo.Delete(id)
 	if err != nil {

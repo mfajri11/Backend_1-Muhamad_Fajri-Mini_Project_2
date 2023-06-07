@@ -8,9 +8,9 @@ type CustomerResponse struct {
 }
 
 type CustomerParams struct {
-	FirstName string `json:"first_name" form:"name"`
+	FirstName string `json:"first_name" form:"name" binding:"required"`
 	LastName  string `json:"last_name"`
-	Email     string `json:"email" form:"email"`
-	Avatar    string `json:"avatar"`
-	Page      int    `form:"page"`
+	Email     string `json:"email" form:"email" binding:"required,email"`
+	Avatar    string `json:"avatar" binding:"http_url"`
+	Page      int    `json:"-" form:"page" binding:"numeric"`
 }

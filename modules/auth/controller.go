@@ -7,6 +7,7 @@ import (
 
 type IAuthController interface {
 	Login(req LoginParams) (LoginResponse, error)
+	ValidateToken(token string) (any, error)
 }
 
 type AuthController struct {
@@ -37,4 +38,8 @@ func (ctrl *AuthController) Login(req LoginParams) (LoginResponse, error) {
 	}
 
 	return resp, nil
+}
+
+func (uc AuthController) ValidateToken(token string) (any, error) {
+	return uc.AuthUC.ValidateToken(token)
 }

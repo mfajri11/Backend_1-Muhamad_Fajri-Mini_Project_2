@@ -5,6 +5,7 @@ import (
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/dto"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/customer"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -26,11 +27,13 @@ func (h CustomerRequestHandler) Create(c *gin.Context) {
 	req := CustomerParams{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Create: error bind json: %w", err)
 		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
 	resp, err := h.customerController.Create(req)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Create: error create customer: %w", err)
 		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
 		return
 	}
@@ -42,11 +45,13 @@ func (h CustomerRequestHandler) Update(c *gin.Context) {
 	req := CustomerParams{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Update: error bind json: %w", err)
 		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
 	resp, err := h.customerController.Update(req)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Update: error update customer: %w", err)
 		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
 		return
 	}

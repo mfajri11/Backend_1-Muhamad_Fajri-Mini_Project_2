@@ -35,13 +35,15 @@ func (v VerifiedType) Value() (driver.Value, error) {
 }
 
 type Account struct {
-	ID             uint
-	Username       string
-	HashedPassword string
-	RoleID         uint
-	Role           Role `gorm:"constraint:OnDelete:CASCADE"`
-	Verified       VerifiedType
-	Activated      ActivatedType
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID                 uint
+	Username           string
+	HashedPassword     string `gorm:"column:password"`
+	RoleID             uint
+	Role               Role `gorm:"constraint:OnDelete:CASCADE"`
+	RegisterApprovalID uint
+	RegisterApproval   RegisterApproval `gorm:"constraint:OnDelete:CASCADE"`
+	Verified           VerifiedType
+	Activated          ActivatedType
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }

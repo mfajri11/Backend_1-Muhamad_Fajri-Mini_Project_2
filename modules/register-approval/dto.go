@@ -9,8 +9,8 @@ type RegisterApprovalResponse struct {
 
 type RegisterApprovalParams struct {
 	ID           uint   `json:"id"`
-	AdminID      uint   `json:"admin_id"`
-	SuperAdminID uint   `json:"super_admin_id"`
-	Status       string `json:"status"`
-	Page         int    `form:"page"`
+	AdminID      uint   `json:"admin_id" binding:"numeric"`
+	SuperAdminID uint   `json:"super_admin_id" binding:"numeric"`
+	Status       string `json:"status" binding:"oneof=pending rejected approved"`
+	Page         int    `form:"page" binding:"numeric"`
 }
