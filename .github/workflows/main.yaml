@@ -1,0 +1,17 @@
+name: CI/CD
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        run: sudo apt update && sudo apt install golang -y
+
+      - name: Build
+        run: |
+          go build -o mini-project ./main.go
