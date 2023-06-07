@@ -42,8 +42,15 @@ func (h CustomerRequestHandler) Create(c *gin.Context) {
 }
 
 func (h CustomerRequestHandler) Update(c *gin.Context) {
-	req := CustomerParams{}
-	err := c.ShouldBindJSON(&req)
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Update: error parse path params id: %w", err)
+		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
+		return
+	}
+	req := CustomerUpdateParams{ID: uint(id)}
+	err = c.ShouldBindJSON(&req)
 	if err != nil {
 		log.Printf("modules.CustomerRequestHandler.Update: error bind json: %w", err)
 		c.JSON(http.StatusBadRequest, nil)
@@ -63,11 +70,13 @@ func (h CustomerRequestHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Delete: error parse path params id: %w", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	err = h.customerController.Delete(uint(id))
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Delete: error delete customer: %w", err)
 		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
 		return
 	}
@@ -77,15 +86,17 @@ func (h CustomerRequestHandler) Delete(c *gin.Context) {
 }
 
 func (h CustomerRequestHandler) Search(c *gin.Context) {
-	req := CustomerParams{}
+	req := CustomerUpdateParams{}
 	err := c.ShouldBindQuery(&req)
 	if err != nil {
+		log.Printf("modules.CustomerRequestHandler.Search: error bind query: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	resp, err := h.customerController.Search(req.Page, req.FirstName, req.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.CustomerRequestHandler.Search: error search customer: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 

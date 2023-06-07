@@ -25,7 +25,7 @@ func (r CustomerRouter) Handle(e *gin.Engine) {
 	basePath := "/customer"
 	account := e.Group(basePath)
 	account.POST("/", r.customerHandler.Create)
-	account.PUT("/:id", r.customerHandler.Update)
+	account.PATCH("/:id", r.customerHandler.Update)
 	account.DELETE("/:id", r.customerHandler.Delete)
 	account.GET("/search", r.customerHandler.Search)
 }

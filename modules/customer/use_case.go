@@ -8,7 +8,7 @@ import (
 
 type ICustomerUseCase interface {
 	Create(params CustomerParams) (entity.Customer, error)
-	Update(params CustomerParams) (*entity.Customer, error)
+	Update(params CustomerUpdateParams) (*entity.Customer, error)
 	Delete(id uint) error
 	Search(page int, name string, email string) ([]*entity.Customer, error)
 }
@@ -37,8 +37,9 @@ func (uc *CustomerUseCase) Create(customer CustomerParams) (entity.Customer, err
 	return newCustomer, nil
 }
 
-func (uc *CustomerUseCase) Update(customer CustomerParams) (*entity.Customer, error) {
+func (uc *CustomerUseCase) Update(customer CustomerUpdateParams) (*entity.Customer, error) {
 	newCustomer := entity.Customer{
+		ID:        customer.ID,
 		FirstName: customer.FirstName,
 		LastName:  customer.LastName,
 		Email:     customer.Email,

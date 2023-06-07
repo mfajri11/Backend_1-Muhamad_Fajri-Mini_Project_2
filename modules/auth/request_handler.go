@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func NewAuthRequestHandler(db *gorm.DB) *AuthRequestHandler {
 		authCtrl: &AuthController{
 			AuthUC: &AuthUseCase{
 				accountRepo:  account2.NewAccountRepository(db),
-				tokenManager: security.NewTokenManager("secret")}}}
+				tokenManager: security.NewTokenManager(os.Getenv("JWT_SECRET_KEY"))}}}
 }
 
 func (h *AuthRequestHandler) Login(c *gin.Context) {
@@ -36,8 +37,8 @@ func (h *AuthRequestHandler) Login(c *gin.Context) {
 	}
 	resp, err := h.authCtrl.Login(req)
 	if err != nil {
-		log.Printf("modules.AuthRequestHandler.Login: error login: %w", err)
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.AuthRequestHandler.Login: error login: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 
@@ -56,8 +57,8 @@ func (h *AuthRequestHandler) AuthorizationRequired(c *gin.Context) {
 	token := tokenStr[len(bearerSchema):]
 	payload, err := h.authCtrl.ValidateToken(token)
 	if err != nil {
-		log.Println("modules.AuthRequestHandler.AuthorizationRequired: error validate token: %w", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.AuthRequestHandler.AuthorizationRequired: error validate token: %s", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 	c.Set("Authorization", payload)

@@ -13,7 +13,7 @@ type IAccountRepository interface {
 	Update(account *entity.Account) (*entity.Account, error)
 	//Search(page int, username string) ([]*entity.Account, error)
 	FindByUsername(page int, username string) (*entity.Account, error)
-	UpdateActivatedAccount(id uint, activateValue string) error
+	UpdateActivatedAccount(id uint, activated bool) error
 	FirstByUsername(username string) (*entity.Account, error)
 }
 
@@ -57,11 +57,11 @@ func (repo *AccountRepository) Delete(id uint) error {
 }
 
 func (repo *AccountRepository) Update(account *entity.Account) (*entity.Account, error) {
-	err := repo.db.Model(&entity.Account{}).Where("id = ? ", account.ID).Updates(account).Error
+	err := repo.db.Model(&entity.Account{}).Where("id = ? ", account.ID).Updates(&account).Error
 	if err != nil {
 		return nil, fmt.Errorf("repostiory.AccountRepository.Update: error update account: %w", err)
 	}
-	err = repo.db.Find(&account).Error
+	err = repo.db.Preload("Role").First(&account, account.ID).Error
 	if err != nil {
 		return nil, fmt.Errorf("repostiory.AccountRepository.Update: error find account: %w", err)
 	}
@@ -96,11 +96,11 @@ func (repo *AccountRepository) FirstByUsername(username string) (*entity.Account
 	return &account, nil
 }
 
-func (repo *AccountRepository) UpdateActivatedAccount(id uint, activateValue string) error {
+func (repo *AccountRepository) UpdateActivatedAccount(id uint, activated bool) error {
 	err := repo.db.
 		Model(&entity.Account{}).
 		Where("id = ?", id).
-		Update("activated", activateValue).
+		Update("activated", activated).
 		Error
 	if err != nil {
 		return fmt.Errorf("repostiory.AccountRepository.UpdateActivateAccount: error update account: %w", err)

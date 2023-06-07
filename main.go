@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/modules/account"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/modules/auth"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/modules/customer"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+
 	router := gin.New()
 	router.Use(gin.Recovery())
 	store := db.MustOpenGormMysql()

@@ -7,7 +7,7 @@ import (
 
 type ICustomerController interface {
 	Create(req CustomerParams) (CustomerResponse, error)
-	Update(req CustomerParams) (CustomerResponse, error)
+	Update(req CustomerUpdateParams) (CustomerResponse, error)
 	Delete(id uint) error
 	Search(page int, name string, email string) (CustomerResponse, error)
 }
@@ -37,7 +37,7 @@ func (ctrl *CustomerController) Create(req CustomerParams) (CustomerResponse, er
 	return res, nil
 }
 
-func (ctrl *CustomerController) Update(req CustomerParams) (CustomerResponse, error) {
+func (ctrl *CustomerController) Update(req CustomerUpdateParams) (CustomerResponse, error) {
 	account, err := ctrl.customerUC.Update(req)
 	if err != nil {
 		return CustomerResponse{}, fmt.Errorf("modules.CustomerController.Update: error update customer: %w", err)

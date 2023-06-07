@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type AccountRequestHandler struct {
@@ -44,14 +43,25 @@ func (h *AccountRequestHandler) Create(c *gin.Context) {
 }
 
 func (h *AccountRequestHandler) Update(c *gin.Context) {
-	req := AccountParams{}
-	err := c.ShouldBindJSON(&req)
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil || id == 0 {
+		log.Printf("modules.AccountRequestHandler.Update: error parsing path param: %w", err)
+		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
+		return
+	}
+	req := AccountUpdateParams{
+		ID: uint(id),
+	}
+	err = c.ShouldBindJSON(&req)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.Update: error bad request: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	resp, err := h.accountController.Update(c, req)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.Update: error update account: %w", err)
 		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
 		return
 	}
@@ -62,11 +72,13 @@ func (h *AccountRequestHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.Delete: error parsing path param: %w", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	err = h.accountController.Delete(c, uint(id))
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.Delete: error delete account: %w", err)
 		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
 		return
 	}
@@ -75,15 +87,17 @@ func (h *AccountRequestHandler) Delete(c *gin.Context) {
 }
 
 func (h *AccountRequestHandler) FindByUsername(c *gin.Context) {
-	accountQuery := AccountParams{}
+	accountQuery := AccountUpdateParams{}
 	err := c.ShouldBindQuery(&accountQuery)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.FindByUsername: error bind query: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	resp, err := h.accountController.FindByUsername(accountQuery.Page, accountQuery.UserName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.AccountRequestHandler.FindByUsername: error find account: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 
@@ -94,19 +108,22 @@ func (h *AccountRequestHandler) UpdateActivatedAccount(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.UpdateActivatedAccount: error parse path param: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 
-	accountQuery := AccountParams{}
+	accountQuery := AccountUpdateParams{}
 	err = c.ShouldBindJSON(&accountQuery)
 	if err != nil {
+		log.Printf("modules.AccountRequestHandler.UpdateActivatedAccount: error bind json: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
-	err = h.accountController.UpdateActivatedAccount(c, uint(id), strings.ToLower(accountQuery.ActivatedValue))
+	err = h.accountController.UpdateActivatedAccount(c, uint(id), accountQuery.Activated)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.AccountRequestHandler.UpdateActivatedAccount: error update activated value: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 

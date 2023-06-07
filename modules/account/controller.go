@@ -8,10 +8,10 @@ import (
 
 type IAccountController interface {
 	Create(ctx context.Context, req AccountParams) (AccountResponse, error)
-	Update(ctx context.Context, req AccountParams) (AccountResponse, error)
+	Update(ctx context.Context, req AccountUpdateParams) (AccountResponse, error)
 	Delete(ctx context.Context, id uint) error
 	FindByUsername(page int, username string) (AccountResponse, error)
-	UpdateActivatedAccount(ctx context.Context, id uint, activatedValue string) error
+	UpdateActivatedAccount(ctx context.Context, id uint, activated bool) error
 }
 
 type AccountController struct {
@@ -42,7 +42,7 @@ func (ctrl *AccountController) Create(ctx context.Context, req AccountParams) (A
 	return res, nil
 }
 
-func (ctrl *AccountController) Update(ctx context.Context, req AccountParams) (AccountResponse, error) {
+func (ctrl *AccountController) Update(ctx context.Context, req AccountUpdateParams) (AccountResponse, error) {
 	account, err := ctrl.AccountUC.Update(ctx, req)
 	if err != nil {
 		return AccountResponse{}, fmt.Errorf("modules.AccountController.Update: error update account: %w", err)
@@ -71,8 +71,8 @@ func (ctrl *AccountController) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (ctrl *AccountController) UpdateActivatedAccount(ctx context.Context, id uint, activatedValue string) error {
-	err := ctrl.AccountUC.UpdateActivatedAccount(ctx, id, activatedValue)
+func (ctrl *AccountController) UpdateActivatedAccount(ctx context.Context, id uint, activated bool) error {
+	err := ctrl.AccountUC.UpdateActivatedAccount(ctx, id, activated)
 	if err != nil {
 		return fmt.Errorf("modules.AccountController.UpdateActivatedAccount: error update account: %w", err)
 	}

@@ -12,10 +12,10 @@ import (
 
 type IAccountUseCase interface {
 	Create(ctx context.Context, accountParams AccountParams) (entity.Account, error)
-	Update(ctx context.Context, accountParams AccountParams) (*entity.Account, error)
+	Update(ctx context.Context, accountParams AccountUpdateParams) (*entity.Account, error)
 	Delete(ctx context.Context, id uint) error
 	FindByUsername(page int, username string) (*entity.Account, error)
-	UpdateActivatedAccount(ctx context.Context, id uint, activatedValue string) error
+	UpdateActivatedAccount(ctx context.Context, id uint, activatedValue bool) error
 }
 
 type AccountUseCase struct {
@@ -44,7 +44,7 @@ func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParam
 		UpdatedAt:        time.Time{},
 		RegisterApproval: entity.RegisterApproval{Status: "pending", SuperAdminID: 1},
 	}
-	//TODO: create side effect populate newAccount with role_id and approval_id
+
 	err = uc.accountRepo.Create(newAccount)
 	if err != nil {
 		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error create account %w", err)
@@ -56,15 +56,17 @@ func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParam
 	return newAccount, nil
 }
 
-func (uc *AccountUseCase) Update(ctx context.Context, accountParams AccountParams) (*entity.Account, error) {
+func (uc *AccountUseCase) Update(ctx context.Context, accountParams AccountUpdateParams) (*entity.Account, error) {
 	if !uc.isSuperAdmin(ctx) {
 		return &entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
 	}
+	// TODO: use map[string]any for updating struct field to its zero value
 	newAccount := entity.Account{
+		ID:        accountParams.ID,
 		Username:  accountParams.UserName,
+		Verified:  entity.VerifiedType(accountParams.Verified),
+		Activated: entity.ActivatedType(accountParams.Activated),
 		Role:      entity.Role{Name: accountParams.RoleName},
-		CreatedAt: time.Time{},
-		UpdatedAt: time.Time{},
 	}
 	acc, err := uc.accountRepo.Update(&newAccount)
 	if err != nil {
@@ -83,11 +85,11 @@ func (uc *AccountUseCase) FindByUsername(page int, username string) (*entity.Acc
 	return acc, nil
 }
 
-func (uc *AccountUseCase) UpdateActivatedAccount(ctx context.Context, id uint, activatedValue string) error {
+func (uc *AccountUseCase) UpdateActivatedAccount(ctx context.Context, id uint, activated bool) error {
 	if !uc.isSuperAdmin(ctx) {
 		return fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
 	}
-	err := uc.accountRepo.UpdateActivatedAccount(id, activatedValue)
+	err := uc.accountRepo.UpdateActivatedAccount(id, activated)
 	if err != nil {
 		return fmt.Errorf("modules.AccountUseCase.UpdateActivatedAccount: error update account %w", err)
 	}
