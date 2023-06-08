@@ -17,9 +17,8 @@ func MustOpenGormMysql() *gorm.DB {
 		os.Getenv("MYSQL_DB"))
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
-		log.Fatal("db.MustOpenGormMysql: error open connection to mysql: %w", err)
+		log.Fatalf("db.MustOpenGormMysql: error open connection to mysql: %s", err)
 	}
-
 	return db
 
 }
