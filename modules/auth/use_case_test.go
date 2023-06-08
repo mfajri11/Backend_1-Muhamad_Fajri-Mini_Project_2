@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/entity"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/utils/security"
@@ -44,6 +45,35 @@ func TestAuthUseCase_Login(t *testing.T) {
 			},
 			wantToken: "token",
 		},
+		{
+			name: "error login (unregistered account)",
+			args: args{
+				username: "test",
+				password: "testtesttest",
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().FirstByUsername("test").Return(nil, errors.New("error account not found"))
+			},
+			wantErr: true,
+		},
+		{
+			name: "error login (error generate token)",
+			args: args{
+				username: "test",
+				password: "testtesttest",
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().FirstByUsername("test").Return(&entity.Account{
+					ID:             1,
+					Username:       "test",
+					HashedPassword: "$2a$10$CX8FIbhwXvQ7C3X2dE.TnexaiGfvjANy4r07Lqje4t1.QTC86keOy",
+				}, nil)
+				f.tokenManager.EXPECT().
+					GenerateToken("test", mock.Anything, mock.Anything).
+					Return("", errors.New("error generate token"))
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -85,6 +115,14 @@ func TestAuthUseCase_ValidateToken(t *testing.T) {
 				f.tokenManager.EXPECT().ValidateToken("token").Return(&security.JWTClaims{}, nil)
 			},
 			want: &security.JWTClaims{},
+		},
+		{
+			name: "error validate token",
+			args: args{token: ""},
+			prepareMocks: func(f *fields) {
+				f.tokenManager.EXPECT().ValidateToken("").Return(nil, errors.New("error generate token"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

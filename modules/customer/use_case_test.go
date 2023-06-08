@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"errors"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/entity"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/customer"
 	"github.com/stretchr/testify/assert"
@@ -45,11 +46,27 @@ func TestCustomerUseCase_Create(t *testing.T) {
 				Avatar:    "https://test/avatar1.png",
 			},
 		},
+		{
+			name: "error create customer",
+			args: args{customer: CustomerParams{
+				FirstName: "test",
+				LastName:  "only",
+				Email:     "test@example.com",
+				Avatar:    "https://test/avatar1.png",
+			}},
+			prepareMock: func(f *fields) {
+				f.customerRepo.EXPECT().Create(mock.Anything).Return(errors.New("error create customer"))
+			},
+			want:    entity.Customer{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.fields.customerRepo = customer.NewMockICustomerRepository(t)
-			tt.prepareMock(&tt.fields)
+			if tt.prepareMock != nil {
+				tt.prepareMock(&tt.fields)
+			}
 			uc := &CustomerUseCase{
 				customerRepo: tt.fields.customerRepo,
 			}
@@ -102,6 +119,20 @@ func TestCustomerUseCase_Update(t *testing.T) {
 				Avatar:    "https://test/avatar1.png",
 			},
 		},
+		{
+			name: "error update customer",
+			args: args{customer: CustomerUpdateParams{
+				// ID is required
+				FirstName: "updated",
+				LastName:  "once again updated",
+				Email:     "updated.again@example.com",
+			}},
+			prepareMocks: func(f *fields) {
+				f.customerRepo.EXPECT().Update(mock.Anything).Return(nil, errors.New("error update customer"))
+			},
+			want:    &entity.Customer{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -139,6 +170,14 @@ func TestCustomerUseCase_Delete(t *testing.T) {
 			prepareMocks: func(f *fields) {
 				f.customerRepo.EXPECT().Delete(uint(1)).Return(nil)
 			},
+		},
+		{
+			name: "error delete customer",
+			args: args{id: 0},
+			prepareMocks: func(f *fields) {
+				f.customerRepo.EXPECT().Delete(uint(0)).Return(errors.New("error delete customer"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -195,6 +234,19 @@ func TestCustomerUseCase_Search(t *testing.T) {
 					Email:     "test@example.com",
 				},
 			},
+		},
+		{
+			name: "error search customer by email",
+			args: args{
+				email: "test@example.com",
+			},
+			prepareMocks: func(f *fields) {
+				f.customerRepo.
+					EXPECT().
+					Search(0, "", "test@example.com").
+					Return(nil, errors.New("error search customer"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

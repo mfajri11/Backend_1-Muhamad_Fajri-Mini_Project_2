@@ -1,6 +1,7 @@
 package register_approval
 
 import (
+	"errors"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/entity"
 	register_approval "github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/register-approval"
 	"github.com/stretchr/testify/assert"
@@ -56,6 +57,15 @@ func TestRegisterApprovalUseCase_FindAll(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "success find all pending approval",
+			args: args{page: 1},
+			prepareMocks: func(f *fields) {
+				f.registerApprovalRepo.EXPECT().FindAll(1).Return(nil, errors.New("error find all pending approval"))
+			},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -97,6 +107,17 @@ func TestRegisterApprovalUseCase_UpdateApprovalStatus(t *testing.T) {
 			prepareMocks: func(f *fields) {
 				f.registerApprovalRepo.EXPECT().UpdateApprovalStatus(uint(1), "approved").Return(nil)
 			},
+		},
+		{
+			name: "error update approval status",
+			args: args{
+				id:  uint(0),
+				val: "rejected",
+			},
+			prepareMocks: func(f *fields) {
+				f.registerApprovalRepo.EXPECT().UpdateApprovalStatus(uint(0), "rejected").Return(errors.New("error update approval status"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

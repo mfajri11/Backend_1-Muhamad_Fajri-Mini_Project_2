@@ -2,6 +2,7 @@ package account
 
 import (
 	"context"
+	"errors"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/entity"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/repository/account"
 	"github.com/mfajri11/Backend_1-Muhamad_Fajri-Mini_Project_2/utils/security"
@@ -10,6 +11,7 @@ import (
 	"testing"
 )
 
+// for testing purpose only
 func ctxJWTClaimWithSuperAdminRole() context.Context {
 	return context.WithValue(context.Background(), "Authorization", &security.JWTClaims{Role: "super admin"})
 }
@@ -75,6 +77,22 @@ func TestAccountUseCase_Create(t *testing.T) {
 					return nil
 				})
 			},
+		},
+		{
+			name: "error create account",
+			args: args{
+				ctx: ctxJWTClaimWithSuperAdminRole(),
+				accountParams: AccountParams{
+					UserName: "test",
+					Password: "test123",
+					RoleName: "test admin",
+				},
+			},
+			want: entity.Account{},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().Create(mock.Anything).Return(errors.New("error create account"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -143,6 +161,21 @@ func TestAccountUseCase_Update(t *testing.T) {
 				Activated:          true,
 			},
 		},
+		{
+			name: "error update account",
+			args: args{
+				ctx: ctxJWTClaimWithSuperAdminRole(),
+				accountParams: AccountUpdateParams{
+					ID:       1,
+					UserName: "updated",
+				},
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().Update(mock.Anything).Return(nil, errors.New("error update account"))
+			},
+			want:    &entity.Account{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -206,6 +239,19 @@ func TestAccountUseCase_FindByUsername(t *testing.T) {
 				Activated:          false,
 			},
 		},
+		{
+			name: "error find account by username",
+			args: args{
+				page:     1,
+				username: "test",
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().FindByUsername(1, "test").Return(
+					nil, errors.New("error find account by username"))
+			},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -249,6 +295,18 @@ func TestAccountUseCase_UpdateActivatedAccount(t *testing.T) {
 				f.accountRepo.EXPECT().UpdateActivatedAccount(uint(5), true).Return(nil)
 			},
 		},
+		{
+			name: "error update activated account",
+			args: args{
+				ctx:       ctxJWTClaimWithSuperAdminRole(),
+				id:        uint(5),
+				activated: true,
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().UpdateActivatedAccount(uint(5), true).Return(errors.New("error update activated account"))
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -287,6 +345,17 @@ func TestAccountUseCase_Delete(t *testing.T) {
 			prepareMocks: func(f *fields) {
 				f.accountRepo.EXPECT().Delete(uint(5)).Return(nil)
 			},
+		},
+		{
+			name: "error delete account",
+			args: args{
+				ctx: ctxJWTClaimWithSuperAdminRole(),
+				id:  uint(5),
+			},
+			prepareMocks: func(f *fields) {
+				f.accountRepo.EXPECT().Delete(uint(5)).Return(errors.New("error delete account"))
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
