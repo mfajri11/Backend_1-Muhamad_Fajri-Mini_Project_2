@@ -7,8 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name ICustomerRepository
 type ICustomerRepository interface {
-	Create(customer entity.Customer) error
+	Create(customer *entity.Customer) error
 	Update(customer *entity.Customer) (*entity.Customer, error)
 	Delete(id uint) error
 	Search(page int, name string, email string) ([]*entity.Customer, error)
@@ -22,7 +23,7 @@ func NewCustomerRepository(db *gorm.DB) *CustomerRepository {
 	return &CustomerRepository{db: db}
 }
 
-func (repo *CustomerRepository) Create(customer entity.Customer) error {
+func (repo *CustomerRepository) Create(customer *entity.Customer) error {
 	err := repo.db.Create(&customer).Error
 	if err != nil {
 		return fmt.Errorf("repostiory.CustomerRepository.Create: error create customer: %w", err)

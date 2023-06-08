@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name IRegisterApprovalRepository
 type IRegisterApprovalRepository interface {
 	FindAll(page int) ([]*entity.RegisterApproval, error)
 	UpdateApprovalStatus(id uint, val string) error
