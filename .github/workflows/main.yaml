@@ -6,7 +6,7 @@ on:
       - deploy/mini-project-3
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
