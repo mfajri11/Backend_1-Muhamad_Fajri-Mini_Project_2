@@ -7,21 +7,21 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - JWT_SECRET_KEY=secret
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DB=testdb
-      - MYSQL_HOST=db
-      - MYSQL_PORT=3306
+      - JWT_SECRET_KEY=secrets.JWT_SECRET_KEY
+      - MYSQL_USERNAME=vars.MYSQL_USERNAME
+      - MYSQL_PASSWORD=vars.MYSQL_PASSWORD
+      - MYSQL_DB=vars.MYSQL_DB
+      - MYSQL_HOST=vars.MYSQL_HOST
+      - MYSQL_PORT=vars.MYSQL_PORT
     depends_on:
       - db
   db:
     container_name: db
     image: mysql:8.0
     environment:
-      - MYSQl_USER=roots
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=testdb
+      - MYSQl_USER=vars.MYSQL_USERNAME
+      - MYSQL_ROOT_PASSWORD=vars.MYSQL_PASSWORD
+      - MYSQL_DATABASE=vars.MYSQL_DB
     ports:
       - "3306:3306"
     volumes:
