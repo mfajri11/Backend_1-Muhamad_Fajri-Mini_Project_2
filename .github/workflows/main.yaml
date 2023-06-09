@@ -35,11 +35,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Compose up
         uses: isbang/compose-action@v1.4.1
@@ -47,13 +47,13 @@ jobs:
           compose-file: "./docker-compose.yaml"
 
 
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: |
-            1
-            1
-          build-args: |
-            1.0.0
+#      - name: Build and push
+#        id: docker_build
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          tags: |
+#            1
+#            1
+#          build-args: |
+#            1.0.0
