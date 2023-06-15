@@ -27,9 +27,9 @@ func NewAccountUseCase(accountRepo accountRepo.IAccountRepository) *AccountUseCa
 }
 
 func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParams) (entity.Account, error) {
-	//if !uc.isSuperAdmin(ctx) {
-	//	return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
-	//}
+	if !uc.isSuperAdmin(ctx) {
+		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error unauthorized")
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(accountParams.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error hash password %w", err)
@@ -45,7 +45,7 @@ func (uc *AccountUseCase) Create(ctx context.Context, accountParams AccountParam
 		RegisterApproval: entity.RegisterApproval{Status: "pending", SuperAdminID: 1},
 	}
 
-	err = uc.accountRepo.Create(newAccount)
+	err = uc.accountRepo.Create(&newAccount)
 	if err != nil {
 		return entity.Account{}, fmt.Errorf("modules.AccountUseCase.Create: error create account %w", err)
 	}

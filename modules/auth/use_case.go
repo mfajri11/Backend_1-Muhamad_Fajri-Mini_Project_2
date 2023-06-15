@@ -12,6 +12,7 @@ type IAuthUseCase interface {
 	ValidateToken(token string) (any, error)
 }
 
+//go:generate mockery --name ITokenManager
 type ITokenManager interface {
 	GenerateToken(username string, role string, exp time.Time) (string, error)
 	ValidateToken(token string) (any, error)
@@ -40,7 +41,7 @@ func (uc *AuthUseCase) Login(username, password string) (token string, exp time.
 	if err != nil {
 		return "", time.Time{}, fmt.Errorf("modules.AuthUseCase.Login: error generate token %w", err)
 	}
-	return token, expireTime, nil
+	return token, expireTime.Add(48 * time.Hour), nil
 }
 
 func (uc AuthUseCase) ValidateToken(token string) (any, error) {

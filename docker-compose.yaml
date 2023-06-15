@@ -1,0 +1,31 @@
+version: '2'
+services:
+  mp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET_KEY=secret
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DB=testdb
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: mysql:8.0
+    environment:
+      - MYSQl_USER=roots
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=testdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - .:/docker-entrypoint-initdb.d
+volumes:
+  db-data:

@@ -7,8 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockery --name IAccountRepository
 type IAccountRepository interface {
-	Create(account entity.Account) error
+	Create(account *entity.Account) error
 	Delete(id uint) error
 	Update(account *entity.Account) (*entity.Account, error)
 	//Search(page int, username string) ([]*entity.Account, error)
@@ -25,7 +26,7 @@ func NewAccountRepository(db *gorm.DB) IAccountRepository {
 	return &AccountRepository{db: db}
 }
 
-func (repo *AccountRepository) Create(account entity.Account) error {
+func (repo *AccountRepository) Create(account *entity.Account) error {
 	err := repo.db.Create(&account).Error
 	if err != nil {
 		return fmt.Errorf("repostiory.AccountRepository.Create: error create account: %w", err)

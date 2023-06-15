@@ -29,7 +29,7 @@ func (uc *CustomerUseCase) Create(customer CustomerParams) (entity.Customer, err
 		Avatar:    customer.Avatar,
 	}
 
-	err := uc.customerRepo.Create(newCustomer)
+	err := uc.customerRepo.Create(&newCustomer)
 	if err != nil {
 		return entity.Customer{}, fmt.Errorf("modules.CustomerUseCase.Create: error create customer %w", err)
 	}

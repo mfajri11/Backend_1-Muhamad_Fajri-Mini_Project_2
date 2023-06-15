@@ -27,14 +27,14 @@ func (h CustomerRequestHandler) Create(c *gin.Context) {
 	req := CustomerParams{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Create: error bind json: %w", err)
+		log.Printf("modules.CustomerRequestHandler.Create: error bind json: %s", err)
 		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
 	resp, err := h.customerController.Create(req)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Create: error create customer: %w", err)
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.CustomerRequestHandler.Create: error create customer: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 
@@ -45,21 +45,21 @@ func (h CustomerRequestHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Update: error parse path params id: %w", err)
+		log.Printf("modules.CustomerRequestHandler.Update: error parse path params id: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	req := CustomerUpdateParams{ID: uint(id)}
 	err = c.ShouldBindJSON(&req)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Update: error bind json: %w", err)
+		log.Printf("modules.CustomerRequestHandler.Update: error bind json: %s", err)
 		c.JSON(http.StatusBadRequest, nil)
 		return
 	}
 	resp, err := h.customerController.Update(req)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Update: error update customer: %w", err)
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.CustomerRequestHandler.Update: error update customer: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 
@@ -70,14 +70,14 @@ func (h CustomerRequestHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Delete: error parse path params id: %w", err)
+		log.Printf("modules.CustomerRequestHandler.Delete: error parse path params id: %s", err)
 		c.JSON(http.StatusBadRequest, dto.DefaultBadRequestResponse())
 		return
 	}
 	err = h.customerController.Delete(uint(id))
 	if err != nil {
-		log.Printf("modules.CustomerRequestHandler.Delete: error delete customer: %w", err)
-		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponseWithMessage(err.Error()))
+		log.Printf("modules.CustomerRequestHandler.Delete: error delete customer: %s", err)
+		c.JSON(http.StatusInternalServerError, dto.DefaultErrorResponse())
 		return
 	}
 

@@ -9,6 +9,9 @@ then run this command `go generate -v ./...`
 to create a table you can use gorm feature for auto migration
 see [migration](https://gorm.io/docs/migration.html)
 
+please generate mock file using [mockery](https://vektra.github.io/mockery) if you do not have one installed on you own machine
+then run this command `go generate -v ./...`
+
 ```go
 // add this code to main.go after assignment to 'store' variable
 
